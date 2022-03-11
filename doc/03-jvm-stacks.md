@@ -43,21 +43,21 @@ public class StackSimulation {
 
 1. 首先，我们在main里面打上断点，开始调试。
 
-![image-20220311194916548](https://github.com/QiutianDog/jvm-learning/blob/main/images/jvm-stacks-01.png)
+![image-20220311194916548](../images/jvm-stacks-01.png)
 
 - 左边：虚拟机中已经有了一个栈帧，是main方法的栈帧。
 - 右边：main方法栈帧内部的变量，可以看到不仅有方法参数还有方法内局部变量。
 
 2. 单点调试，进入method方法。
 
-![image-20220311195347612](https://github.com/QiutianDog/jvm-learning/blob/main/images/jvm-stacks-02.png)
+![image-20220311195347612](../images/jvm-stacks-02.png)
 
 - 左边：虚拟机栈中压入了新的栈帧，method方法栈帧，并且在main方法栈帧之上，符合栈的逻辑结构。
 - 右边：method方法的方法参数和局部变量。
 
 3. 继续调试，到执行完method方法。
 
-![image-20220311195650067](https://github.com/QiutianDog/jvm-learning/blob/main/images/jvm-stacks-03.png)
+![image-20220311195650067](../images/jvm-stacks-03.png)
 
 - 注意已经到了main:20，而不是之前main:19，这代表的是执行到的代码行数。
 
