@@ -3,13 +3,12 @@
 
 随缘更新。
 
-[TOC]
 
 
 
 ## jvm 的基本框架（2022.3.11）
 
-![img.png](img.png)
+![img](https://github.com/QiutianDog/jvm-learning/blob/main/img.png)
 
 主要包含两部分：
 
