@@ -8,7 +8,7 @@
 
 ## jvm 的基本框架（2022.3.11）
 
-![img](https://github.com/QiutianDog/jvm-learning/blob/main/img.png)
+![img.png](./img.png)
 
 主要包含两部分：
 
