@@ -158,3 +158,47 @@ Code:
 
 至于为什么 "a" + "b"直接变成了"ab"，是因为编译器在编译时就已经做了优化。
 
+## intern
+
+主动将串池中还没有的字符串对象放入串池。
+```
+// java 代码
+String s = new String("a") + new String("b");
+String s2 = s.intern();
+System.out.println(s2 == "ab");
+
+// 反编译结果
+Code:
+  stack=4, locals=3, args_size=1
+     0: new           #2                  // class java/lang/StringBuilder
+     3: dup
+     4: invokespecial #3                  // Method java/lang/StringBuilder."<init>":()V
+     7: new           #4                  // class java/lang/String
+    10: dup
+    11: ldc           #5                  // String a
+    13: invokespecial #6                  // Method java/lang/String."<init>":(Ljava/lang/String;)V
+    16: invokevirtual #7                  // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    19: new           #4                  // class java/lang/String
+    22: dup
+    23: ldc           #8                  // String b
+    25: invokespecial #6                  // Method java/lang/String."<init>":(Ljava/lang/String;)V
+    28: invokevirtual #7                  // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    31: invokevirtual #9                  // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+    34: astore_1
+    35: aload_1
+    36: invokevirtual #10                 // Method java/lang/String.intern:()Ljava/lang/String;
+    39: astore_2
+    40: getstatic     #11                 // Field java/lang/System.out:Ljava/io/PrintStream;
+    43: aload_2
+    44: ldc           #12                 // String ab
+    46: if_acmpne     53
+    49: iconst_1
+    50: goto          54
+    53: iconst_0
+    54: invokevirtual #13                 // Method java/io/PrintStream.println:(Z)V
+    57: return
+```
+可以看到在执行 new String("a") + new String("b") 的时候，它先是构造了一个StringBuilder对象，再依次append字符串a和字符串b，本身"a"与"b"属于字面量，在串池中有相应的对象。
+然而新构造的"ab"对象属于toString创建出来的，没有放入串池，而是在堆中。前面的例子已经证明，对象拼接的结果不会放入串池。后面执行s.intern，将"ab"对象放入了串池中。
+
+intern方法可以将串池中还没有的字符串对象放入串池，如果串池中有该对象，就会返回串池中的对象。

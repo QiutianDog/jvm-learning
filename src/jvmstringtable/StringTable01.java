@@ -22,9 +22,30 @@ public class StringTable01 {
 
         String x2 = new String("c") + new String("d");
         String x1 = "cd";
-        x2 = x2.intern();
+        x2.intern();
 
         // 如果调换最后两行的位置 情况如何
         System.out.println(x1 == x2);
+
+        /*
+         * s1 串池中 "a"
+         * s2 串池中 "b"
+         * s3 串池中 "ab"
+         * s4 堆中 "ab"
+         * s5 串池中 "ab"
+         * s6 串池中 "ab"
+         * F
+         * T
+         * T
+         *
+         * x2 堆中 "cd"
+         * x1 串池中 "cd"
+         * F
+         * 调换位置后
+         * x2 堆中 "cd"
+         * x2 串池中 "cd" （调用了intern方法 将本身放入串池中，因为串池中原先没有"cd"）
+         * x1 串池中 "cd"
+         * T
+         */
     }
 }
