@@ -202,3 +202,66 @@ Code:
 然而新构造的"ab"对象属于toString创建出来的，没有放入串池，而是在堆中。前面的例子已经证明，对象拼接的结果不会放入串池。后面执行s.intern，将"ab"对象放入了串池中。
 
 intern方法可以将串池中还没有的字符串对象放入串池，如果串池中有该对象，就会返回串池中的对象。
+
+## StringTable 位置
+
+![jvm-method-area-01.png](../images/jvm-method-area-01.png)
+
+StringTable在1.8中是堆中划分出来的一块虚拟区域，实际上还是存在与堆中，只是逻辑上属于StringTable。
+
+可以用一个例子来测试一下
+```java
+    List<String> list = new ArrayList<>();
+    long max = 26000L;
+    long index = 0;
+    try {
+        for (index = 0; index < max; index++) {
+            list.add(String.valueOf(index).intern());
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        System.out.println(index);
+    }
+
+    // 设置堆的内存大小 -Xmx2m -Xms0m
+    Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+```
+可以看见 最后报的异常为Java heap space，为堆内存溢出。
+
+## StringTable 垃圾回收
+
+因为StringTable在物理上属于堆中，所以跟堆一样享有内存回收机制（GC），当堆内存不够时，就会触发垃圾回收。
+
+```java
+/**
+ * 展示StringTable会存在垃圾回收，不停的创建字符串对象，放入堆中，设置堆的最大内存。
+ * -Xmx4m -XX:+PrintStringTableStatistics -XX:+PrintGCDetails -verbose:gc
+ * PrintStringTableStatistics 启动打印StringTable信息
+ * PrintGCDetails 打印 GC 回收信息
+ */
+long max = 10000L;
+long index = 0;
+try {
+    for (index = 0; index < max; index++) {
+        String.valueOf(index).intern();
+    }
+} catch (Exception e) {
+    e.printStackTrace();
+} finally {
+    System.out.println(index);
+}
+
+// 输出结果（部分）
+[GC (Allocation Failure) [PSYoungGen: 510K->480K(1024K)] 510K->496K(3584K), 0.0008842 secs] [Times: user=0.01 sys=0.00, real=0.00 secs]
+[GC (Allocation Failure) [PSYoungGen: 980K->464K(1024K)] 996K->480K(3584K), 0.0004980 secs] [Times: user=0.01 sys=0.00, real=0.00 secs]
+[GC (Allocation Failure) [PSYoungGen: 976K->496K(1024K)] 992K->528K(3584K), 0.0017527 secs] [Times: user=0.00 sys=0.00, real=0.01 secs]
+10000
+StringTable statistics:
+Number of buckets       :     60013 =    480104 bytes, avg   8.000
+Number of entries       :      7036 =    168864 bytes, avg  24.000
+Number of literals      :      7036 =    355600 bytes, avg  50.540
+Total footprint         :           =   1004568 bytes
+```
+
+可以看到 Number of entries 也就是键值对堆个数（StringTable本质时HashTable）并没有10000+，因为触发过三次垃圾回收。
