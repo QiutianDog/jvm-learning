@@ -265,3 +265,14 @@ Total footprint         :           =   1004568 bytes
 ```
 
 可以看到 Number of entries 也就是键值对堆个数（StringTable本质时HashTable）并没有10000+，因为触发过三次垃圾回收。
+
+## StringTable 调优
+
+前面说过，StringTable本质是一个HashTable。由链表和数组组成，上面的例子里面
+Number of buckets 代表桶的个数，就是代表数组的长度，如果数组长度太小，会造成严重的hash冲突，如果太大，会造成数据稀疏，所以桶的大小就尤为重要。
+
+
+可以使用JVM参数代设定桶的大小。
+```
+-XX:StringTableSize=20000
+```
